@@ -5,6 +5,8 @@ services:
     image: bitnami/zookeeper:latest
     ports:
       - "2181:2181"
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
     healthcheck:
       test: ["CMD", "echo", "ruok", "|", "nc", "localhost", "2181"]
       interval: 10s
@@ -19,8 +21,7 @@ services:
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
     depends_on:
-      zookeeper:
-        condition: service_healthy
+      - zookeeper
 
   fetch_flight_data:
     build:
