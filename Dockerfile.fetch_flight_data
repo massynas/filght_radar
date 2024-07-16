@@ -1,17 +1,9 @@
-# Use the jupyter/pyspark-notebook image as the base
 FROM jupyter/pyspark-notebook
 
-# Set the working directory
 WORKDIR /app
 
-# Copy your Python script(s) into the container
 COPY fetch_flight_data.py /app
 
-# Install additional packages if needed (e.g., kafka-python, FlightRadarAPI)
 RUN pip install pyspark  kafka-python FlightRadarAPI
 
-# Optionally, expose the port if your script runs a service
-# EXPOSE 8080
-
-# Set the default command to run your Python script
 CMD ["python", "fetch_flight_data.py"]

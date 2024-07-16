@@ -8,14 +8,12 @@ from pyspark.sql import SparkSession
 from pyspark.sql.functions import *
 from pyspark.sql.types import *
 
-# Configuration Kafka
 KAFKA_SERVER = "kafka:9092"
 FLIGHT_TOPIC = "flights"
 AIRLINE_TOPIC = "airlines"
 AIRPORT_TOPIC = "airports"
 ZONE_TOPIC = "zones"
 
-# Configuration logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 def get_flights(fr_api):
@@ -116,31 +114,24 @@ def send_to_kafka(producer, data, topic):
 if __name__ == "__main__":
     logging.info("Starting Flight Data to Kafka script")
 
-    # Initialize FlightRadar24API
     fr_api = FlightRadar24API()
 
-    # Initialize Spark session
     spark = SparkSession.builder.appName("FlightRadar24ToParquet").getOrCreate()
 
-    # Kafka configuration
     producer = KafkaProducer(
         bootstrap_servers=KAFKA_SERVER,
         value_serializer=lambda v: json.dumps(v).encode('utf-8')
     )
 
-    # Send zones data once
     zones = get_zones(fr_api)
     send_to_kafka(producer, zones, ZONE_TOPIC)
 
-    # Get and send airlines data
     airlines = get_airlines(fr_api)
     send_to_kafka(producer, airlines, AIRLINE_TOPIC)
 
-    # Get and send airports data
     airports = get_airports(fr_api)
     send_to_kafka(producer, airports, AIRPORT_TOPIC)
 
-    # Function to fetch and send flights data
     def fetch_and_send_data():
         flights = get_flights(fr_api)
         send_to_kafka(producer, flights, FLIGHT_TOPIC)
@@ -149,9 +140,8 @@ if __name__ == "__main__":
     while True:
         fetch_and_send_data()
         logging.info("Sleeping for 1 minute")
-        time.sleep(60)  # Wait for 1 minute
+        time.sleep(60)  
 
-    # Clean up
     producer.flush()
     producer.close()
     spark.stop()

@@ -1,15 +1,10 @@
-# Utiliser l'image jupyter/pyspark-notebook
 FROM jupyter/pyspark-notebook:latest
 
-# Définir le répertoire de travail
 WORKDIR /app
 
-# Créer le répertoire de données et définir les permissions
 RUN mkdir -p /app/data && chmod -R 777 /app/data
 
-# Copier le script de streaming Spark dans le conteneur
 COPY spark_streaming.py /app/
 
-# Commande par défaut pour exécuter spark-submit avec votre script
 CMD ["spark-submit", "--master", "local[2]", "--packages", "org.apache.spark:spark-sql-kafka-0-10_2.12:3.1.1", "/app/spark_streaming.py"]
 
